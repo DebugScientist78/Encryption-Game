@@ -4,23 +4,20 @@
 
 class Image {
 private:
-	int x,y;
-	int width;
-	int height;
 	std::string path;
-	SDL_Texture* texture;
+	SDL_Rect rect;
 public:
 	Image();
-	~Image();
 
 	void setSize(int width, int height);
+	void setCords(int x, int y);
 	void setImgPath(std::string path);
-	int* getWidth();
-	int* getHeight();
-	SDL_Texture* getTexture();
+	int getWidth();
+	int getHeight();
+	SDL_Rect getRect();
 
 	SDL_Texture* LoadImage(SDL_Renderer* render);
-	void renderTexture(SDL_Renderer *ren, int x, int y);
+	void renderTexture(SDL_Texture *tex, SDL_Renderer *ren);
 	bool ClickedOn(SDL_Event e);
 };
 

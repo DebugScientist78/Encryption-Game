@@ -2,30 +2,32 @@
 
 Image::Image()
 {
-	width = 0;
-	height = 0;
-	texture = nullptr;
-}
-
-Image::~Image() {
-	SDL_DestroyTexture(texture);
+	rect.h = 0;
+	rect.w = 0;
+	rect.x = 0;
+	rect.y = 0;
 }
 
 void Image::setSize(int width, int height) {
-	this->width = width;
-	this->height = height;
+	rect.w = width;
+	rect.h = height;
 }
 
-int* Image::getWidth() {
-	return &width;
+void Image::setCords(int x, int y) {
+	rect.x = x;
+	rect.y = y;
 }
 
-int* Image::getHeight() {
-	return &height;
+int Image::getWidth() {
+	return rect.w;
 }
 
-SDL_Texture* Image::getTexture() {
-	return texture;
+int Image::getHeight() {
+	return rect.h;
+}
+
+SDL_Rect Image::getRect() {
+	return rect;
 }
 
 void Image::setImgPath(std::string path) {
@@ -50,24 +52,11 @@ SDL_Texture* Image::LoadImage(SDL_Renderer* render) {
 	return temp;
 }
 
-/**
-* Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
-* the texture's width and height
-* @param tex The source texture we want to draw
-* @param ren The renderer we want to draw to
-* @param x The x coordinate to draw to
-* @param y The y coordinate to draw to
-*/
-void Image::renderTexture(SDL_Renderer *ren, int x, int y) {
+void Image::renderTexture(SDL_Texture *tex, SDL_Renderer *ren) {
 	//Setup the destination rectangle to be at the position we want
-	SDL_Rect dst;
-	dst.x = x;
-	dst.y = y;
-	this->x = x;
-	this->y = y;
 	//Query the texture to get its width and height to use
-	SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
-	SDL_RenderCopy(ren, texture, NULL, &dst);
+	SDL_QueryTexture(tex, NULL, NULL, &rect.w, &rect.h);
+	SDL_RenderCopy(ren, tex, NULL, &rect);
 }
 
 bool Image::ClickedOn(SDL_Event e)
@@ -77,8 +66,8 @@ bool Image::ClickedOn(SDL_Event e)
 		bool inside = true;
 		int x, y;
 		SDL_GetMouseState(&x, &y);
-		if (x < this->x || y < this->y) inside = false;
-		if (x > this->x+this->width || y > this->y+this->height) inside = false;
+		if (x < rect.x || y < rect.y) inside = false;
+		if (x > rect.x+rect.w || y > rect.y+rect.h) inside = false;
 		if (!inside) pass = false;
 	}
 	else {

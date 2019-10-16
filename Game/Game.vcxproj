@@ -19,10 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\keyinput.h" />
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\keyinput.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\SDL Helper Functions.cpp" />
@@ -82,12 +85,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\lib\x86;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\user\Downloads\school\Game\Game\SDL2_ttf-2.0.15\include;C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\lib\x86;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\lib\x86;C:\Users\user\Downloads\school\Game\Game\SDL2_ttf-2.0.15\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\lib\x86;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\user\Downloads\school\Game\Game\SDL2_ttf-2.0.15\include;C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\lib\x86;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\lib\x86;C:\Users\user\Downloads\school\Game\Game\SDL2_ttf-2.0.15\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,10 +98,10 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\user\Downloads\school\Game\Game\SDL2_ttf-2.0.15\include;C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -118,12 +121,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\user\Downloads\school\Game\Game\SDL2_ttf-2.0.15\include;C:\Users\user\Downloads\school\Game\Game\SDL2-devel-2.0.10-VC\SDL2-2.0.10\include;C:\Users\user\Downloads\school\Game\Game\SDL2_image-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>

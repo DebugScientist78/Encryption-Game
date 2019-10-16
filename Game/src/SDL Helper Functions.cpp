@@ -2,6 +2,11 @@
 
 SDL_Window* gWindow;
 SDL_Renderer* gRender;
+SDL_Texture* backText;
+Image Background;
+
+int scrMode;
+bool gExit;
 
 /**
 * Log an SDL error with some error message to the output stream of our choice
@@ -38,7 +43,12 @@ bool init() {
 				int imgFlags = IMG_INIT_PNG;
 				if (!(IMG_Init(imgFlags) & imgFlags))
 				{
-					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+					logSDLError("SDL_image could not initialize!");
+					success = false;
+				}
+				if (TTF_Init() == -1)
+				{
+					logSDLError("SDL_ttf could not initialize!");
 					success = false;
 				}
 			}
