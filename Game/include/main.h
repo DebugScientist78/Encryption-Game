@@ -7,11 +7,11 @@
 
 #include <stdio.h>
 #include <iostream>
-#include <vector>
+#include <fstream>
+#include <sstream>
 #include <string>
 
 #include "image.h"
-#include "keyinput.h"
 
 enum screen {
 	TITLE = 1,
@@ -26,9 +26,12 @@ const int HEIGHT = 720;
 extern SDL_Window* gWindow;
 extern SDL_Renderer* gRender;
 extern SDL_Texture* backText;
+extern SDL_Texture* bButtonText;
 extern Image Background;
+extern Image backButton;
 extern int scrMode;
 extern bool gExit;
+extern bool gTutorial;
 
 void logSDLError(std::string msg);
 
@@ -40,5 +43,7 @@ void loadMain();
 void loadTitle();
 void loadHelp();
 void loadOptions();
+
+SDL_Texture* LoadFont(SDL_Texture* texture, std::string msg, SDL_Color color, TTF_Font* font, int wrapL);
 
 #endif // !MAIN_H

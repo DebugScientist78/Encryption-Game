@@ -1,8 +1,2 @@
 ﻿  Game.cpp
-c:\users\user\downloads\school\game\game\src\game.cpp(65): warning C4101: 'e': unreferenced local variable
-  SDL Helper Functions.cpp
-  image.cpp
-  keyinput.cpp
-  main.cpp
-  Generating Code...
   Game.vcxproj -> C:\Users\user\Downloads\school\Game\Debug\Game.exe

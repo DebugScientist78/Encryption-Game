@@ -3,10 +3,13 @@
 SDL_Window* gWindow;
 SDL_Renderer* gRender;
 SDL_Texture* backText;
+SDL_Texture* bButtonText;
 Image Background;
+Image backButton;
 
 int scrMode;
 bool gExit;
+bool gTutorial;
 
 /**
 * Log an SDL error with some error message to the output stream of our choice
@@ -63,4 +66,22 @@ void clean() {
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
 	SDL_Quit();
+}
+
+SDL_Texture* LoadFont(SDL_Texture* texture,std::string msg, SDL_Color color, TTF_Font* font, int wrapL) {
+	SDL_Surface* temp = NULL;
+	temp = TTF_RenderText_Blended_Wrapped(font,msg.c_str(),color,wrapL);
+	if (temp == NULL) {
+		logSDLError("Failed to load text");
+	}
+	else {
+		texture = SDL_CreateTextureFromSurface(gRender, temp);
+		if (texture == NULL) {
+			logSDLError("Failed conversion");
+		} 
+		SDL_FreeSurface(temp);
+		temp = NULL;
+	}
+
+	return texture;
 }

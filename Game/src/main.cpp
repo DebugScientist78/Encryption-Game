@@ -8,6 +8,7 @@ int main(int argc, char *args[]) {
 	}
 	else {
 		gExit = false;
+		gTutorial = true;
 		while (!gExit) {
 			if (scrMode == TITLE) {
 				loadTitle();
