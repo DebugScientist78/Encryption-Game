@@ -1,3 +1,30 @@
 Welcome to Decrypt! A game that teaches you the basics surrounding encryption. You're a poor hacker who is tasked with completing client's jobs, to steal information and get out of collage debt. (You were to lazy to listen to your parents)
 
-sdfsfwsgsdf
+RULES::
+- First you'll be given a message for the task you'll be completing
+- Once the task is accepted, a timer will begin as you attempt to complete it
+- You're to unscramble the message given
+- The key given, are clues to how to unscramble the message
+- If you unscramble the message incorrectly, then you will have to try again and get a 
+  major time reduction
+- If successful, you will move on to the next level
+
+What is Encryption::
+
+     The game is not an exact replication of hacking nor decryption. Its simply a way of looking
+     at encryption. At the most basic, encryption is taking raw information and scrambling it to 
+     the point where the message is unintelligable. Encryption is important to wireless communications
+     where sensitive data needs to be protected.
+
+     Most encryption processes, break down into a key system. Symmetric keys and asymmetric keys. 
+     Symmetric keys are used for the encrypting and decrypting of information. While asymmetric keys 
+     have different keys for encrypting and decrypting. This game will teach you about the different
+     types of encryption algorithums.
+
+
+More information can be found at:
+https://digitalguardian.com/blog/what-data-encryption 
+https://www.howtogeek.com/howto/33949/htg-explains-what-is-encryption-and-how-does-it-work/ 
+
+
+     

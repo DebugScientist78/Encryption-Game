@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\keyinput.h" />
+    <ClInclude Include="include\levelGenerator.h" />
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\keyinput.cpp" />
+    <ClCompile Include="src\levelGenerator.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\SDL Helper Functions.cpp" />

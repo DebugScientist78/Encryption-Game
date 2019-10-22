@@ -10,6 +10,7 @@ Image backButton;
 int scrMode;
 bool gExit;
 bool gTutorial;
+int day;
 
 /**
 * Log an SDL error with some error message to the output stream of our choice
@@ -65,6 +66,7 @@ void clean() {
 	gRender = NULL;
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
+	TTF_Quit();
 	SDL_Quit();
 }
 

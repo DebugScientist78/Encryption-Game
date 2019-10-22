@@ -4,6 +4,7 @@
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\image.h" />
     <ClInclude Include="include\keyinput.h" />
+    <ClInclude Include="include\levelGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -11,6 +12,7 @@
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\keyinput.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\levelGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="graphics\Title Background.bmp" />

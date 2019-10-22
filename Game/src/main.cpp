@@ -9,11 +9,13 @@ int main(int argc, char *args[]) {
 	else {
 		gExit = false;
 		gTutorial = true;
+		srand((int)time(0));
 		while (!gExit) {
 			if (scrMode == TITLE) {
 				loadTitle();
 			}
 			else if (scrMode == MAIN) {
+				day = 0;
 				loadMain();
 			}
 			else if (scrMode == HELP) {
@@ -21,6 +23,9 @@ int main(int argc, char *args[]) {
 			}
 			else if (scrMode == OPTITIONS) {
 				loadOptions();
+			}
+			else if (scrMode == LECTURE) {
+				loadLecture();
 			}
 			else {
 				std::cout << "Transition failed" << std::endl;
