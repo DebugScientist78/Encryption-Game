@@ -2,11 +2,10 @@ Welcome to Decrypt! A game that teaches you the basics surrounding encryption. Y
 
 RULES::
 - First you'll be given a message for the task you'll be completing
-- Once the task is accepted, a timer will begin as you attempt to complete it
 - You're to unscramble the message given
 - The key given, are clues to how to unscramble the message
-- If you unscramble the message incorrectly, then you will have to try again and get a 
-  major time reduction
+- If you unscramble the message incorrectly, then you will have to try again and 
+  you lose a life
 - If successful, you will move on to the next level
 
 What is Encryption::

@@ -27,15 +27,15 @@ void loadTitle() {
 	startBlock.setImgPath("graphics/Title-Start.png");
 	startBlockText = startBlock.LoadImage(gRender);
 
-	Image Options = Image();
-	Options.setSize(364, 120);
-	Options.setCords((WIDTH / 2) - (Options.getWidth() / 2), (startBlock.getHeight() + startBlock.getRect().y) + 20);
-	Options.setImgPath("graphics/Title-Options.png");
-	OptionsText = Options.LoadImage(gRender);
+	Image lecture = Image();
+	lecture.setSize(364, 120);
+	lecture.setCords((WIDTH / 2) - (lecture.getWidth() / 2), (startBlock.getHeight() + startBlock.getRect().y) + 20);
+	lecture.setImgPath("graphics/Title-info.png");
+	OptionsText = lecture.LoadImage(gRender);
 
 	Image Help = Image();
 	Help.setSize(364, 120);
-	Help.setCords((WIDTH / 2) - (Help.getWidth() / 2), (Options.getHeight() + Options.getRect().y) + 20);
+	Help.setCords((WIDTH / 2) - (Help.getWidth() / 2), (lecture.getHeight() + lecture.getRect().y) + 20);
 	Help.setImgPath("graphics/Title-Help.png");
 	HelpText = Help.LoadImage(gRender);
 
@@ -55,8 +55,8 @@ void loadTitle() {
 					scrMode = MAIN;
 					quit_flag = true;
 				}
-				if (Options.ClickedOn(e)) {
-					scrMode = OPTITIONS;
+				if (lecture.ClickedOn(e)) {
+					scrMode = LECTURE;
 					quit_flag = true;
 				}
 				if (Help.ClickedOn(e)) {
@@ -75,7 +75,7 @@ void loadTitle() {
 		Background.renderTexture(backText, gRender);
 		title.renderTexture(titleText, gRender);
 		startBlock.renderTexture(startBlockText, gRender);
-		Options.renderTexture(OptionsText, gRender);
+		lecture.renderTexture(OptionsText, gRender);
 		Help.renderTexture(HelpText, gRender);
 		SDL_RenderPresent(gRender);
 		SDL_Delay(15);
@@ -196,9 +196,9 @@ void loadMain() {
 
 	SDL_Texture* TypeTexture = NULL;
 	SDL_Rect typeRect;
-	typeRect.h = 80;
-	typeRect.w = 620;
-	typeRect.x = (WIDTH / 2) - (typeRect.w/2);
+	typeRect.h = 60;
+	typeRect.w = 10;
+	typeRect.x = (WIDTH / 2) - (typeRect.w/2)-100;
 	typeRect.y = userInputRect.y + 100;
 	TTF_Font* typefont = TTF_OpenFont("fonts/m5x7.ttf", 25);
 	TypeTexture = LoadFont(TypeTexture, input, { 0,0,0 }, typefont, typeRect.w);
@@ -223,7 +223,7 @@ void loadMain() {
 			if (pause.ClickedOn(e)) {
 				loadPause(quit);
 			}
-			if (e.key.keysym.sym == SDLK_BACKSPACE && input.length() > 0) {
+			if (state[SDL_SCANCODE_BACKSPACE] && input.length() > 0) {
 				input.pop_back();
 			}
 			else if (e.type == SDL_TEXTINPUT) {
@@ -231,14 +231,9 @@ void loadMain() {
 				input += e.text.text;
 			}
 			else if (state[SDL_SCANCODE_RETURN] && levelComplete == true && e.key.repeat == 0) {
-				std::string temp = input;
-				std::string temp2 = ans_string;
-				input = "";
-				ans_string = "";
-				SDL_StopTextInput();
 				std::cout << "space" << std::endl;
-				std::cout << (temp == temp2) << std::endl;
-				if (temp == temp2) {
+				std::cout << (input == ans_string) << std::endl;
+				if (input == ans_string) {
 					levelComplete = false;
 					day++;
 				}
@@ -246,7 +241,8 @@ void loadMain() {
 					life--;
 					levelComplete = false;
 				}
-				SDL_StartTextInput();
+				input = "";
+				ans_string = "";
 			}
 
 			/*if (renderText) {
@@ -265,10 +261,10 @@ void loadMain() {
 		pause.renderTexture(pauseText, gRender);
 		lifeImg.renderTexture(lifeTexture, gRender);
 		life_str = "x " + std::to_string(life);
-		lifeCounterTexture = LoadFont(lifeCounterTexture, life_str, { 0,0,0 }, lifefont, lifetextRect.w);
+		lifeCounterTexture = LoadFont(lifeCounterTexture, life_str, { 255,255,255 }, lifefont, lifetextRect.w);
 		SDL_RenderCopy(gRender, lifeCounterTexture, NULL, &lifetextRect);
 		day_str = "Day: " + std::to_string(day);
-		dayCounterTexture = LoadFont(dayCounterTexture, day_str, { 0,0,0 }, lifefont, daytextRect.w);
+		dayCounterTexture = LoadFont(dayCounterTexture, day_str, { 255,255,255 }, lifefont, daytextRect.w);
 		SDL_RenderCopy(gRender, dayCounterTexture, NULL, &daytextRect);
 		
 		promptDisplay_str = "Unscramble: " + raw_string;
@@ -277,6 +273,7 @@ void loadMain() {
 		
 		SDL_RenderCopy(gRender, userInputTexture, NULL, &userInputRect);
 
+		typeRect.w = input.length() * 10;
 		TypeTexture = LoadFont(TypeTexture, input, { 0,0,0 }, typefont, 1000);
 		SDL_RenderCopy(gRender, TypeTexture, NULL, &typeRect);
 
@@ -306,6 +303,12 @@ void loadMain() {
 	lifeCounterTexture = NULL;
 	SDL_DestroyTexture(msgBoxText);
 	msgBoxText = NULL;
+	SDL_DestroyTexture(userInputTexture);
+	userInputTexture = NULL;
+	SDL_DestroyTexture(promptTexture);
+	promptTexture = NULL;
+	SDL_DestroyTexture(TypeTexture);
+	TypeTexture = NULL;
 	return;
 }
 
@@ -404,8 +407,46 @@ void loadOptions() {
 }
 
 void loadLecture() {
+	std::string tips[12] = {
+		"The more days you survive, the harder the levels become. The harder scrambling algorithums, use permutations to shuffle the text. Most encryption keys, use a form a permutation, called Substitutation-permutation network",
+		"The first 10 days have a chance of 66% giving and easy scramble, the trick is, the characters are simply shifted. Digital encryption was used during WW2 called the Engima.",
+		"Encryption for the internet was originially setup by the US government, encryption didn't go public till the 1970s.",
+		"A lot of effective encryption algorithums manipulate data on a binary level.",
+		"The internet, has many standareds for encryption such as SSL and SSH.",
+		"A common part of encryption, is the key. The key takes the text and can scramble/unscramble it.", 
+		"After 9 days in game, the difficulty will shift from a 75% chance of medium messages and 25% of hard messages.",
+		"Popular encyption keys, are AES, RSA and Twofish. Many keys also have key sizes, determining the amount of bits being used.",
+		"There are two distinct types of encryption keys; symmetric and asymmetric. symmetric keys mean the key is used for both encrypting and decrypting. While asymmetric keys use two diferent keys to encrypt and decrypt.",
+		"The hardest difficulty in this game, is the closet to actual encryption algorithums. Where the string is permutated and shuffled. Though actual algorithums use more mathematically complex methods.",
+		"You can play around with encryption yourself! Many programming languages, have a crytography API to use. They include encryption keys used in industry.",
+		"Encryption may be obselete thanks to quantum computing. Encryption is intended to be unbreakable by clasical computers, quantum computers could break them in hours."
+	};
 	Background.setImgPath("graphics/Lecture.bmp");
 	backText = Background.LoadImage(gRender);
+
+	std::ifstream in;
+	in.open("dialog/Lecture Templete.txt");
+	std::string templete = (static_cast<std::stringstream const&>(std::stringstream() << in.rdbuf()).str()); 
+
+	TTF_Font* bodyFont = TTF_OpenFont("fonts/m5x7.ttf", 24);
+	SDL_Rect bodyRect;
+	bodyRect.h = 150;
+	bodyRect.w = 1100;
+	bodyRect.x = (WIDTH / 2) - (bodyRect.w / 2);
+	bodyRect.y = 110;
+	SDL_Texture* bodyTexture = NULL;
+	bodyTexture = LoadFont(bodyTexture, templete, { 0,0,0 },bodyFont,bodyRect.w);
+
+	int r = rand() % 12;
+
+	TTF_Font* tipFont = TTF_OpenFont("fonts/m5x7.ttf", 22);
+	SDL_Rect tipRect;
+	tipRect.h = 150;
+	tipRect.w = tips[r].length()*2.8;
+	tipRect.x = (WIDTH / 2) - (tipRect.w / 2);
+	tipRect.y = 20 + bodyRect.h + bodyRect.y;
+	SDL_Texture* tipTexture = NULL;
+	tipTexture = LoadFont(tipTexture, tips[r], { 0,0,0 }, tipFont, tipRect.w);
 
 	bool quit = false;
 	SDL_Event e;
@@ -418,8 +459,23 @@ void loadLecture() {
 					scrMode = TITLE;
 				}
 			}
+			if (e.type == SDL_QUIT) {
+				quit = true;
+				gExit = true;
+				scrMode = 0;
+			}
 		}
+		SDL_RenderClear(gRender);
+		Background.renderTexture(backText, gRender);
+		SDL_RenderCopy(gRender, bodyTexture, NULL, &bodyRect);
+		SDL_RenderCopy(gRender, tipTexture, NULL, &tipRect);
+		SDL_RenderPresent(gRender);
 	}
 	SDL_DestroyTexture(backText);
+	backText = NULL;
+	SDL_DestroyTexture(bodyTexture);
+	bodyTexture = NULL;
+	SDL_DestroyTexture(tipTexture);
+	tipTexture = NULL;
 	return;
 }

@@ -3,7 +3,7 @@
 const std::string easy_msgs[15] = {
 	"Jerry",
 	"Justin",
-	"Dogs and Cats",
+	"Dogs and cats",
 	"Templmen",
 	"Param",
 	"cookies",
