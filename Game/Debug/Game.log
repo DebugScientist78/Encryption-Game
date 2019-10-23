@@ -1,3 +1,9 @@
 ﻿  Game.cpp
 c:\users\user\downloads\school\game\game\src\game.cpp(445): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  keyinput.cpp
+  levelGenerator.cpp
+  main.cpp
+  image.cpp
+  SDL Helper Functions.cpp
+  Generating Code...
   Game.vcxproj -> C:\Users\user\Downloads\school\Game\Debug\Game.exe
