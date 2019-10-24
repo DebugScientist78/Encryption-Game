@@ -19,14 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\keyinput.h" />
+    <ClInclude Include="include\keyinput.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\levelGenerator.h" />
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\keyinput.cpp" />
+    <ClCompile Include="src\keyinput.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\levelGenerator.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\image.cpp" />

@@ -1,0 +1,14 @@
+Game.vcxproj
+Game.vcxproj.filters
+Game.vcxproj.user
+Game.sln
+.db
+.pdb
+.obj
+.suo
+.opendb
+.enc
+.log
+.tlog
+Debug/
+Game/Debug/
