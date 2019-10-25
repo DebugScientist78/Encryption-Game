@@ -167,6 +167,127 @@ void loadPause(bool& mainQuit) {
 	return;
 }
 
+void LoseLevel() {
+	static const std::string questions[15] = {
+		"What is encryption?",//1
+		"What is a symmetric key?",//2
+		"What is today's strongest encryption key?",//3
+		"What does the Asymmetric key mean?",//4
+		"How should a person handle information?",//5
+		"What does SP-network mean?",
+		"What level of information does encryption change?",
+		"When did encryption in the US go public?",
+		"What does the Symmetric key mean?",
+		"What was the Enigma?",
+		"How is encryption relevent?",
+		"How does a computer struggle with encryption?",
+		"What is the purpose of encryption?",
+		"What does SSL mean?",
+		"Why is it encryption hard to break?"
+	};
+
+	static const std::vector<std::vector< std::string> > answers = {
+		{
+			{//1
+				"A) The process of scrambling messages and securing it",
+				"B) Creating algorithms for a machine",
+				"C) Making a computer run",
+				"D) Installing anti-virus programs"
+			}
+		},
+		{
+			{//2
+				"A) A key when drawn, looks symmetric",
+				"B) A key that is used for both encrypting and decrypting",
+				"C) A key that shows the message before and after encrypting",
+				"D) A key with only one function"
+			}
+		},
+		{
+			{//3
+				"A) DES",
+				"B) MD5",
+				"C) Blowfish",
+				"D) AES"
+			}
+		},
+		{
+			{//4
+				"A) A key when drawn, looks aysmmetric",
+				"B) A key that is different from a symmetric key",
+				"C) A key that has two different keys for encryprting and decrypting",
+				"D) A key that has two keys for the client and server"
+			}
+		},
+		{
+			{//5
+				"A) Show everybody and gain trust"
+				"B) Give anyone they know the information",
+				"C) secure it with encryption",
+				"D) Sell the information"
+			}
+		}
+	};
+
+	static const bool answerValues[15][4] = {
+		{//1
+			true,false,false,false
+		},
+		{//2
+			false,true,false,false
+		}
+	};
+
+	static const std::string hardQuestions[5] = {
+		"What is the principles of modern encryption?",
+		"How can encryption keys be exploited?",
+		"Why can quantum computers break encryption?",
+		"What does permutation mean?",
+		"Why is encryption a political concern?",
+	};
+
+	static const std::vector<std::vector<std::string>  > hardAnswers = {
+	};
+
+	static const bool hardAnswersValues[5][4] = {
+	};
+
+	std::string question;
+	std::vector<std::string> anwsersIn;
+	int r;
+	r = rand();
+	question = question[r];
+	anwsersIn[0] = answers[r].at(0);
+	SDL_SetRenderDrawColor(gRender, 245, 138, 66, 0);
+	SDL_Rect backdrop = { WIDTH / 3, HEIGHT / 3, WIDTH / 2, HEIGHT / 2 };
+	SDL_RenderFillRect(gRender, &backdrop);
+
+	SDL_Texture* questionTexture = NULL;
+	SDL_Rect questionRect = { question.length() * 2,90,backdrop.x,backdrop.y + 10 };
+	TTF_Font* questionFont = TTF_OpenFont("fonts/m5x7.ttf", 16);
+	questionTexture = LoadFont(questionTexture, question, { 0,0,0 }, questionFont, questionRect.w);
+
+	bool quit = false;
+	SDL_Event e;
+	while (!quit) {
+		const Uint8 *state = SDL_GetKeyboardState(NULL);
+		if (SDL_WaitEvent(&e) != 0) {
+		}
+		SDL_RenderCopy(gRender, questionTexture, NULL, &questionRect);
+		SDL_RenderPresent(gRender);
+		SDL_Delay(10);
+	}
+
+	SDL_SetRenderDrawColor(gRender, 0, 0, 0, 0);
+	backdrop = { 0,0,0,0 };
+	SDL_RenderFillRect(gRender, &backdrop);
+	SDL_RenderPresent(gRender);
+
+	return;
+}
+
+
+
 /*
 This function loads the main game screen and the logic in the game.
 Where it calls upon the generate and scramble function, in a loop to give constant user feed back
@@ -295,6 +416,7 @@ void loadMain() {
 					//day stays the same, life is deducted
 					life--;
 					levelComplete = false;
+					LoseLevel();
 				}
 				//clears input and anwser
 				input = "";

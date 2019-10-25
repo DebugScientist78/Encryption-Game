@@ -29,6 +29,7 @@ Allowing for string support, algorithms, file access and random generatings
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <algorithm>
 
 //class include of Image class that is a wrapper of Texture class, for images
