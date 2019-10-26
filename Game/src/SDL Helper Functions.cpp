@@ -13,14 +13,10 @@
 SDL_Window* gWindow;
 SDL_Renderer* gRender;
 SDL_Texture* backText;
-SDL_Texture* bButtonText;
 Image Background;
-Image backButton;
 
 int scrMode;
 bool gExit;
-bool gTutorial;
-int day;
 
 /**
 * Log an SDL error with some error message to the output stream of our choice
@@ -35,19 +31,22 @@ void logSDLError(std::string msg) {
 //sets up the window and render, and verifys PNG support and TTF supports
 bool init() {
 	bool success = true;
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	//checks if SDL can load
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
 		printf("SDL is unable to load,  SDL Error: %s\n", SDL_GetError());
 		success = false;
 	}
 	else {
 		gWindow = SDL_CreateWindow("Decrypt", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
-		if (gWindow == NULL) {
+		//checks if window was loaded successfully
+		if (gWindow == nullptr) {
 			logSDLError("Window could not be created!");
 			success = false;
 		}
 		else {
 			gRender = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
-			if (gRender == NULL) {
+			//checks if global Renderer has loaded correctly
+			if (gRender == nullptr) {
 				logSDLError("Renderer could not be created");
 				success = false;
 			}
@@ -62,9 +61,21 @@ bool init() {
 					logSDLError("SDL_image could not initialize!");
 					success = false;
 				}
+				//Font initilalize
 				if (TTF_Init() == -1)
 				{
 					logSDLError("SDL_ttf could not initialize!");
+					success = false;
+				}
+				//Initialize SDL_mixer
+				if (Mix_OpenAudio(44010, MIX_DEFAULT_FORMAT, 2, 4096) < 0)
+				{
+					printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+					success = false;
+				}
+				int audioFlags = MIX_INIT_MP3;
+				if (!(Mix_Init(audioFlags) & audioFlags)) {
+					logSDLError("SDL_mixer could not initialize!");
 					success = false;
 				}
 			}
@@ -76,31 +87,32 @@ bool init() {
 // deallocates the window and render variable and exits the SDL2 system
 void clean() {
 	SDL_DestroyRenderer(gRender);
-	gRender = NULL;
+	gRender = nullptr;
 	SDL_DestroyWindow(gWindow);
-	gWindow = NULL;
+	gWindow = nullptr;
 	TTF_Quit();
 	SDL_Quit();
+	Mix_Quit();
 }
 
 //Wrapper function that returns a texture for a string
 SDL_Texture* LoadFont(SDL_Texture* texture,std::string msg, SDL_Color color, TTF_Font* font, int wrapL) {
 	//needs a surface to convert into a texture temporarily
-	SDL_Surface* temp = NULL;
+	SDL_Surface* temp = nullptr;
 
 	//turns text with font, scolor and wrap limit to a surface
 	temp = TTF_RenderText_Blended_Wrapped(font,msg.c_str(),color,wrapL);
-	if (temp == NULL) {
+	if (temp == nullptr) {
 		logSDLError("Failed to load text");
 	}
 	else {
 		//converts to texture
 		texture = SDL_CreateTextureFromSurface(gRender, temp);
-		if (texture == NULL) {
+		if (texture == nullptr) {
 			logSDLError("Failed conversion");
 		} 
 		SDL_FreeSurface(temp);
-		temp = NULL;
+		temp = nullptr;
 	}
 
 	return texture;

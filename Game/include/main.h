@@ -17,6 +17,7 @@ of the following include statements
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 /*
 Standard C++ and C libraries
@@ -53,13 +54,9 @@ const int HEIGHT = 720;
 extern SDL_Window* gWindow;
 extern SDL_Renderer* gRender;
 extern SDL_Texture* backText;
-extern SDL_Texture* bButtonText;
 extern Image Background;
-extern Image backButton;
 extern int scrMode;
 extern bool gExit;
-extern bool gTutorial;
-extern int day;
 
 //Wrapper for SDL's error logging tool
 void logSDLError(std::string msg);

@@ -8,6 +8,7 @@
 * Author: Chency W
 */
 
+
 /*
 The function loads the title screen of the game.
 The background texture is initlized and set to an image in the graphics folder.
@@ -20,6 +21,10 @@ void loadTitle() {
 	SDL_Texture* startBlockText;
 	SDL_Texture* lectureText;
 	SDL_Texture* HelpText;
+
+	//audio initilize
+	Mix_Music* music = nullptr;
+	music = Mix_LoadMUS("audio/title_music.mp3");
 
 	//setup Background size, position and image
 	//loads it into the background texture
@@ -62,11 +67,17 @@ void loadTitle() {
 
 	//quit condition, changes to true upon exit of program or screen
 	bool quit_flag = false;
+
+	//mute flag
+	bool muted = false;
+
 	//variable that represents the Events that SDL2 records
 	SDL_Event e;
 
 	//loops until user leaves screen or exits game
+	Mix_PlayMusic(music, -1);
 	while (!quit_flag) {
+		const Uint8* state = SDL_GetKeyboardState(nullptr);
 		//verifies vaild event input
 		if (SDL_WaitEvent(&e) != 0) {
 			// exits the game
@@ -90,6 +101,16 @@ void loadTitle() {
 					quit_flag = true;
 				}
 			}
+			//Mutes and unmute
+			if (state[SDL_SCANCODE_M] && e.type == SDL_KEYDOWN) {
+				muted = !muted;
+				if (muted) {
+					Mix_VolumeMusic(128);
+				}
+				else {
+					Mix_VolumeMusic(0);
+				}
+			}
 		}
 		//constantly renders and updates the window
 		SDL_RenderClear(gRender);
@@ -100,19 +121,25 @@ void loadTitle() {
 		Help.renderTexture(HelpText, gRender);
 		SDL_RenderPresent(gRender);
 		//relief for the CPU
-		SDL_Delay(15);
+		SDL_Delay(10);
 	}
 	//deallocates textures upon exit
 	SDL_DestroyTexture(titleText);
-	titleText = NULL;
+	titleText = nullptr;
 	SDL_DestroyTexture(startBlockText);
-	startBlockText = NULL;
+	startBlockText = nullptr;
 	SDL_DestroyTexture(lectureText);
-	lectureText = NULL;
+	lectureText = nullptr;
 	SDL_DestroyTexture(HelpText);
-	HelpText = NULL;
+	HelpText = nullptr;
 	SDL_DestroyTexture(backText);
-	backText = NULL;
+	backText = nullptr;
+	
+	//deallocate audio
+	Mix_HaltMusic();
+	Mix_FreeMusic(music);
+	music = nullptr;
+
 	return;
 }
 
@@ -123,7 +150,7 @@ program is stuck in the pause's while loop
 
 NOTE: this may cause RAM use to jump, I haven't tested though
 */
-void loadPause(bool& mainQuit) {
+void loadPause(bool& mainQuit, bool& mute) {
 
 	//sets up pause box size, position and image
 	// loads it into the pause box texture
@@ -135,10 +162,12 @@ void loadPause(bool& mainQuit) {
 	pauseB.setImgPath("graphics/Pausebox.bmp");
 	pausebText = pauseB.LoadImage(gRender);
 
-
+	//quit flag
 	bool quit = false;
+	//
 	SDL_Event e;
-
+	pauseB.renderTexture(pausebText, gRender);
+	SDL_RenderPresent(gRender);
 	while (!quit) {
 		if (SDL_WaitEvent(&e) != 0) {
 			if (e.type == SDL_KEYDOWN) {
@@ -154,138 +183,216 @@ void loadPause(bool& mainQuit) {
 				case SDLK_p:
 					quit = true;
 					break;
+				case SDLK_m:
+					mute = !mute;
+					break;
 				}
 			}
 		}
 		//renders the pause box texture but not clearing the main screen texture
-		pauseB.renderTexture(pausebText, gRender);
-		SDL_RenderPresent(gRender);
 	}
 	//deallocates texture
 	SDL_DestroyTexture(pausebText);
-	pausebText = NULL;
+	pausebText = nullptr;
 	return;
 }
 
-void LoseLevel() {
-	static const std::string questions[15] = {
-		"What is encryption?",//1
-		"What is a symmetric key?",//2
-		"What is today's strongest encryption key?",//3
-		"What does the Asymmetric key mean?",//4
-		"How should a person handle information?",//5
-		"What does SP-network mean?",
-		"What level of information does encryption change?",
-		"When did encryption in the US go public?",
-		"What does the Symmetric key mean?",
-		"What was the Enigma?",
-		"How is encryption relevent?",
-		"How does a computer struggle with encryption?",
-		"What is the purpose of encryption?",
-		"What does SSL mean?",
-		"Why is it encryption hard to break?"
-	};
+/*
+Loads a question, if answered correctly, they get to see the correct answer from the level
+otherwise, they get the correct answer for the question.
+Then it returns back to the game
+*/
+void LoseLevel(std::string ans) {
 
-	static const std::vector<std::vector< std::string> > answers = {
-		{
-			{//1
-				"A) The process of scrambling messages and securing it",
-				"B) Creating algorithms for a machine",
-				"C) Making a computer run",
-				"D) Installing anti-virus programs"
-			}
-		},
-		{
-			{//2
-				"A) A key when drawn, looks symmetric",
-				"B) A key that is used for both encrypting and decrypting",
-				"C) A key that shows the message before and after encrypting",
-				"D) A key with only one function"
-			}
-		},
-		{
-			{//3
-				"A) DES",
-				"B) MD5",
-				"C) Blowfish",
-				"D) AES"
-			}
-		},
-		{
-			{//4
-				"A) A key when drawn, looks aysmmetric",
-				"B) A key that is different from a symmetric key",
-				"C) A key that has two different keys for encryprting and decrypting",
-				"D) A key that has two keys for the client and server"
-			}
-		},
-		{
-			{//5
-				"A) Show everybody and gain trust"
-				"B) Give anyone they know the information",
-				"C) secure it with encryption",
-				"D) Sell the information"
-			}
-		}
-	};
+	//setup music for questions
+	Mix_Music* music = Mix_LoadMUS("audio/question.mp3");
 
-	static const bool answerValues[15][4] = {
+	//Answer collection to questions;
+	//refer to the images for context
+	static const std::vector<std::vector<bool>> answerValues = {
 		{//1
 			true,false,false,false
 		},
 		{//2
 			false,true,false,false
+		},
+		{//3
+			false,false,false,true
+		}, 
+		{//4
+			false,true,false,false
+		},
+		{//5
+			false,false,true,false
+		},
+		{//6
+			false,false,false,true
+		},
+		{//7
+			true,false,false,false
+		},
+		{//8
+			false,true,false,false
+		},
+		{//9
+			false,false,true,false
+		},
+		{//10
+			true,false,false,false
+		},
+		{//11
+			false,true,false,false
+		},
+		{//12
+			false,false,false,true
+		},
+		{//13
+			false,true,false,false
+		},
+		{//14
+			true,false,false,false
+		},
+		{//15
+			false,false,false,true
 		}
 	};
 
-	static const std::string hardQuestions[5] = {
-		"What is the principles of modern encryption?",
-		"How can encryption keys be exploited?",
-		"Why can quantum computers break encryption?",
-		"What does permutation mean?",
-		"Why is encryption a political concern?",
-	};
-
-	static const std::vector<std::vector<std::string>  > hardAnswers = {
-	};
-
-	static const bool hardAnswersValues[5][4] = {
-	};
-
-	std::string question;
-	std::vector<std::string> anwsersIn;
+	//select random quesiton
 	int r;
-	r = rand();
-	question = question[r];
-	anwsersIn[0] = answers[r].at(0);
-	SDL_SetRenderDrawColor(gRender, 245, 138, 66, 0);
-	SDL_Rect backdrop = { WIDTH / 3, HEIGHT / 3, WIDTH / 2, HEIGHT / 2 };
-	SDL_RenderFillRect(gRender, &backdrop);
+	r = rand()%15;
+	std::vector<bool> answerARR;
+	answerARR = answerValues[r];
+	//std::cout << answerARR[0] << answerARR[1] << answerARR[2] << answerARR[3] << std::endl;
 
-	SDL_Texture* questionTexture = NULL;
-	SDL_Rect questionRect = { question.length() * 2,90,backdrop.x,backdrop.y + 10 };
-	TTF_Font* questionFont = TTF_OpenFont("fonts/m5x7.ttf", 16);
-	questionTexture = LoadFont(questionTexture, question, { 0,0,0 }, questionFont, questionRect.w);
+	//create image to display question
+	Image text = Image();
+	SDL_Texture* txtTexture;
+	text.setSize(845, 475);
+	text.setCords((WIDTH / 2)-(text.getWidth()/2), (HEIGHT / 2)-(text.getHeight()/2));
+	text.setImgPath("graphics/Questions and Answers/Question_" + std::to_string(r+1) + ".bmp");
+	txtTexture = text.LoadImage(gRender);
 
+	SDL_Texture* ansText = nullptr;
+	TTF_Font* ansfont = TTF_OpenFont("fonts/m5x7.ttf", 50);
+	SDL_Rect ansRect;
+	
+	//flags to prevent spam and ensure proper flow of function
 	bool quit = false;
-	SDL_Event e;
+	bool correct = false;
+	bool pressed = false;
+
+	bool muted = false;
+
+	SDL_Event ev;
+
+	Mix_PlayMusic(music, -1);
 	while (!quit) {
-		const Uint8 *state = SDL_GetKeyboardState(NULL);
-		if (SDL_WaitEvent(&e) != 0) {
-		}
-		SDL_RenderCopy(gRender, questionTexture, NULL, &questionRect);
+		text.renderTexture(txtTexture, gRender);
 		SDL_RenderPresent(gRender);
+
+		//array of keyboard states
+		const Uint8 *state = SDL_GetKeyboardState(nullptr);
+		if (SDL_WaitEvent(&ev) != 0) {
+			//mute music or not
+			if (state[SDL_SCANCODE_M]) {
+				muted = !muted;
+				if (muted) {
+					Mix_VolumeMusic(128);
+				}
+				else {
+					Mix_VolumeMusic(0);
+				}
+			}
+
+			//read user input while allowed
+			if (state[SDL_SCANCODE_A] && !pressed) {
+				correct = answerARR[0];
+				pressed = true;
+			}
+			else if (state[SDL_SCANCODE_B] && !pressed) {
+				correct = answerARR[1];
+				pressed = true;
+			}
+			else if (state[SDL_SCANCODE_C] && !pressed) {
+				correct = answerARR[2];
+				pressed = true;
+			}
+			else if (state[SDL_SCANCODE_D] && !pressed) {
+				correct = answerARR[3];
+				pressed = true;
+			}
+
+			if (pressed) {
+				if (correct) {//load correct answer for the level
+					text.setImgPath("graphics/Questions and Answers/correct.bmp");
+					txtTexture = text.LoadImage(gRender);
+					text.renderTexture(txtTexture, gRender);
+					ansRect.h = (ans.length() / 1.5)*10;
+					ansRect.w = (ans.length() * 1.5)*10;
+					ansRect.x = text.getRect().x +150;
+					ansRect.y = text.getRect().y + 300;
+					ansText = LoadFont(ansText, ans, { 0,0,0 }, ansfont, text.getWidth()-50);
+					SDL_RenderCopy(gRender, ansText, nullptr, &ansRect);
+					SDL_RenderPresent(gRender);
+				}
+				else {//load the correct answer for the question
+					text.setImgPath("graphics/Questions and Answers/incorrect.bmp");
+					txtTexture = text.LoadImage(gRender);
+					text.renderTexture(txtTexture, gRender);
+					std::string correctLetter;
+					if (answerARR[0]) {
+						correctLetter = "A)";
+					}
+					else if (answerARR[1]) {
+						correctLetter = "B)";
+					}
+					else if (answerARR[2]) {
+						correctLetter = "C)";
+					}
+					else if (answerARR[3]) {
+						correctLetter = "D)";
+					}
+
+					ansRect.h = 200;
+					ansRect.w = 100;
+					ansRect.x = text.getRect().x + 100;
+					ansRect.y = text.getRect().y + 100;
+					ansText = LoadFont(ansText, correctLetter, { 0,0,0 }, ansfont, 50);
+					SDL_RenderCopy(gRender, ansText, nullptr, &ansRect);
+					SDL_RenderPresent(gRender);
+					SDL_RenderPresent(gRender);
+				}
+				quit = true;
+			}
+		}
 		SDL_Delay(10);
 	}
+	SDL_Delay(10);
+	//waits until the user hits backspace to quit
+	while (1) {
+		const Uint8 *state = SDL_GetKeyboardState(nullptr);
+		if (SDL_WaitEvent(&ev) != 0) {
+			if (state[SDL_SCANCODE_BACKSPACE]) {
+				break;
+			}
+		}
+		SDL_RenderPresent(gRender);
+	}
+	
+	SDL_DestroyTexture(txtTexture);
+	SDL_DestroyTexture(ansText);
+	ansText = nullptr;
+	txtTexture = nullptr;
 
-	SDL_SetRenderDrawColor(gRender, 0, 0, 0, 0);
-	backdrop = { 0,0,0,0 };
-	SDL_RenderFillRect(gRender, &backdrop);
-	SDL_RenderPresent(gRender);
+	TTF_CloseFont(ansfont);
+	ansfont = nullptr;
+
+	Mix_HaltMusic();
+	Mix_FreeMusic(music);
+	music = nullptr;
 
 	return;
 }
-
 
 
 /*
@@ -295,8 +402,12 @@ The user input is also displayed below the message needed to be scrambled
 */
 void loadMain() {
 
+	//setup music
+	Mix_Music* music = Mix_LoadMUS("audio/main_music.mp3");
+
 	//variables for the game, difficulty, life and messages
 	int diff;
+	int day = 0;
 	std::string ans_string;
 	std::string raw_string = "";
 	std::string input = "";
@@ -322,7 +433,7 @@ void loadMain() {
 	lifeTexture = lifeImg.LoadImage(gRender);
 
 	//sets up life counter text
-	SDL_Texture* lifeCounterTexture = NULL;
+	SDL_Texture* lifeCounterTexture = nullptr;
 	TTF_Font* lifefont = TTF_OpenFont("fonts/m5x7.ttf",30);
 	SDL_Rect lifetextRect;
 	lifetextRect.h = 63;
@@ -333,7 +444,7 @@ void loadMain() {
 	lifeCounterTexture = LoadFont(lifeCounterTexture, life_str, { 0,0,0 }, lifefont, lifetextRect.w);
 
 	//sets up day counter
-	SDL_Texture* dayCounterTexture = NULL;
+	SDL_Texture* dayCounterTexture = nullptr;
 	SDL_Rect daytextRect;
 	daytextRect.h = 63;
 	daytextRect.w = 90;
@@ -343,7 +454,7 @@ void loadMain() {
 	dayCounterTexture = LoadFont(dayCounterTexture, day_str, { 0,0,0 }, lifefont, daytextRect.w);
 
 	//sets up prompt message
-	SDL_Texture* promptTexture = NULL;
+	SDL_Texture* promptTexture = nullptr;
 	SDL_Rect promptRect;
 	promptRect.h = 80;
 	promptRect.w = 600;
@@ -356,7 +467,7 @@ void loadMain() {
 	promptTexture = LoadFont(promptTexture, promptDisplay_str, { 0,0,0 }, promptfont, promptRect.w);
 
 	//sets up user input
-	SDL_Texture* userInputTexture = NULL;
+	SDL_Texture* userInputTexture = nullptr;
 	SDL_Rect userInputRect;
 	userInputRect.h = 70;
 	userInputRect.w = 100;
@@ -367,7 +478,7 @@ void loadMain() {
 	userInputTexture = LoadFont(userInputTexture, userDisplay_str, { 0,0,0 }, inputfont, userInputRect.w);
 
 	//sets up typing feedback
-	SDL_Texture* TypeTexture = NULL;
+	SDL_Texture* TypeTexture = nullptr;
 	SDL_Rect typeRect;
 	typeRect.h = 60;
 	typeRect.w = 10;
@@ -380,12 +491,23 @@ void loadMain() {
 	//prevents level change from spamming
 	bool levelComplete = false;
 
+	bool muted = false;
+
 	SDL_Event e;
 	//starts text input
 	SDL_StartTextInput();
+
+	Mix_PlayMusic(music, -1);
 	while (!quit) {
+		if (muted) {
+			Mix_VolumeMusic(128);
+		}
+		else {
+			Mix_VolumeMusic(0);
+		}
+
 		//get key state for typing
-		const Uint8 *state = SDL_GetKeyboardState(NULL);
+		const Uint8 *state = SDL_GetKeyboardState(nullptr);
 		if (SDL_WaitEvent(&e) != 0) {
 			if (e.type == SDL_QUIT) {
 				gExit = true;
@@ -394,7 +516,9 @@ void loadMain() {
 			}
 			//pause game
 			if (pause.ClickedOn(e)) {
-				loadPause(quit);
+				SDL_StopTextInput();
+				loadPause(quit,muted);
+				SDL_StartTextInput();
 			}
 			//backspace for typing input
 			if (state[SDL_SCANCODE_BACKSPACE] && input.length() > 0) {
@@ -402,7 +526,6 @@ void loadMain() {
 			}
 			//appends text input to input string
 			else if (e.type == SDL_TEXTINPUT) {
-				std::cout << "text added" << std::endl;
 				input += e.text.text;
 			}
 			//checks if the input is correct
@@ -416,7 +539,13 @@ void loadMain() {
 					//day stays the same, life is deducted
 					life--;
 					levelComplete = false;
-					LoseLevel();
+					SDL_StopTextInput();
+					Mix_PauseMusic();
+					LoseLevel(ans_string);
+					SDL_StartTextInput();
+					Mix_ResumeMusic();
+					Mix_PlayMusic(music, -1);
+					input.pop_back();
 				}
 				//clears input and anwser
 				input = "";
@@ -432,23 +561,23 @@ void loadMain() {
 		//updates string for life counter
 		life_str = "x " + std::to_string(life);
 		lifeCounterTexture = LoadFont(lifeCounterTexture, life_str, { 255,255,255 }, lifefont, lifetextRect.w);
-		SDL_RenderCopy(gRender, lifeCounterTexture, NULL, &lifetextRect);
+		SDL_RenderCopy(gRender, lifeCounterTexture, nullptr, &lifetextRect);
 		
 		//updates day counter string
 		day_str = "Day: " + std::to_string(day);
 		dayCounterTexture = LoadFont(dayCounterTexture, day_str, { 255,255,255 }, lifefont, daytextRect.w);
-		SDL_RenderCopy(gRender, dayCounterTexture, NULL, &daytextRect);
+		SDL_RenderCopy(gRender, dayCounterTexture, nullptr, &daytextRect);
 		
 		//updates prompt message
 		promptDisplay_str = "Unscramble: " + raw_string;
 		promptTexture = LoadFont(promptTexture, promptDisplay_str, { 0,0,0 }, promptfont, promptRect.w);
-		SDL_RenderCopy(gRender, promptTexture, NULL, &promptRect);
+		SDL_RenderCopy(gRender, promptTexture, nullptr, &promptRect);
 		
-		SDL_RenderCopy(gRender, userInputTexture, NULL, &userInputRect);
+		SDL_RenderCopy(gRender, userInputTexture, nullptr, &userInputRect);
 
 		typeRect.w = input.length() * 10;
 		TypeTexture = LoadFont(TypeTexture, input, { 0,0,0 }, typefont, 1000);
-		SDL_RenderCopy(gRender, TypeTexture, NULL, &typeRect);
+		SDL_RenderCopy(gRender, TypeTexture, nullptr, &typeRect);
 
 		SDL_RenderPresent(gRender);
 
@@ -462,18 +591,19 @@ void loadMain() {
 			backText = Background.LoadImage(gRender);
 			Background.renderTexture(backText, gRender);
 			SDL_RenderPresent(gRender);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 		}
 		//if player has no lives left, player loses then goes to tips/lecture screen
 		if (life <= 0) {
 			quit = true;
 			scrMode = LECTURE;
+
 			SDL_RenderClear(gRender);
 			Background.setImgPath("graphics/loseBG.png");
 			backText = Background.LoadImage(gRender);
 			Background.renderTexture(backText, gRender);
 			SDL_RenderPresent(gRender);
-			SDL_Delay(5000);
+			SDL_Delay(3000);
 		}
 		//generates level
 		if (!levelComplete) {
@@ -481,21 +611,42 @@ void loadMain() {
 			raw_string = Scramble(ans_string, diff);
 			levelComplete = true;
 		}
+		SDL_Delay(10);
 	}
 	//stops text input and deallocate textures
 	SDL_StopTextInput();
+
+	SDL_DestroyTexture(backText);
+	backText = nullptr;
+
 	SDL_DestroyTexture(pauseText);
-	pauseText = NULL;
+	pauseText = nullptr;
 	SDL_DestroyTexture(lifeTexture);
-	lifeTexture = NULL;
+	lifeTexture = nullptr;
+	SDL_DestroyTexture(dayCounterTexture);
+	dayCounterTexture = nullptr;
 	SDL_DestroyTexture(lifeCounterTexture);
-	lifeCounterTexture = NULL;
+	lifeCounterTexture = nullptr;
 	SDL_DestroyTexture(userInputTexture);
-	userInputTexture = NULL;
+	userInputTexture = nullptr;
 	SDL_DestroyTexture(promptTexture);
-	promptTexture = NULL;
+	promptTexture = nullptr;
 	SDL_DestroyTexture(TypeTexture);
-	TypeTexture = NULL;
+	TypeTexture = nullptr;
+
+	TTF_CloseFont(inputfont);
+	inputfont = nullptr;
+	TTF_CloseFont(lifefont);
+	lifefont = nullptr;
+	TTF_CloseFont(promptfont);
+	promptfont = nullptr;
+	TTF_CloseFont(typefont);
+	typefont = nullptr;
+
+	Mix_HaltMusic();
+	Mix_FreeMusic(music);
+	music = nullptr;
+
 	return;
 }
 
@@ -508,7 +659,12 @@ void loadHelp() {
 	Background.setImgPath("graphics/MainScreen.bmp");
 	backText = Background.LoadImage(gRender);
 
+	//music
+	Mix_Music* music = Mix_LoadMUS("audio/help.mp3");
+
 	//sets up back button and sets texture
+	SDL_Texture* bButtonText;
+	Image backButton;
 	backButton.setSize(182, 60);
 	backButton.setCords((WIDTH - backButton.getWidth())-70, 50);
 	backButton.setImgPath("graphics/GoBackButton.png");
@@ -525,23 +681,27 @@ void loadHelp() {
 	msg = (static_cast<std::stringstream const&>(std::stringstream() << in.rdbuf()).str());
 
 	//Sets up text size, position, font and color
-	TTF_Font* maintxt = NULL;
-	SDL_Texture* txtTexture = NULL;
+	TTF_Font* mainFont = nullptr;
+	SDL_Texture* txtTexture = nullptr;
 	SDL_Rect txtRect;
 	txtRect.h = 600;
 	txtRect.w = 900;
 	txtRect.x = ((WIDTH / 2) - (txtRect.w / 2))-100;
 	txtRect.y = 60;
 
-	maintxt = TTF_OpenFont("fonts/m5x7.ttf", 24);
+	mainFont = TTF_OpenFont("fonts/m5x7.ttf", 24);
 	SDL_Color colorText = { 0,0,0 };
 	//loads texture
-	txtTexture = LoadFont(txtTexture, msg, colorText, maintxt,txtRect.w);
+	txtTexture = LoadFont(txtTexture, msg, colorText, mainFont,txtRect.w);
 
 	SDL_Event e;
 	bool quit = false;
 
+	bool muted = false;
+
+	Mix_PlayMusic(music, -1);
 	while (!quit) {
+		const Uint8* state = SDL_GetKeyboardState(nullptr);
 		if (SDL_WaitEvent(&e) != 0) {
 			if (e.type == SDL_QUIT) {
 				quit = true;
@@ -552,23 +712,42 @@ void loadHelp() {
 				scrMode = TITLE;
 				quit = true;
 			}
+			if (state[SDL_SCANCODE_M]) {
+				muted = !muted;
+				if (muted) {
+					Mix_VolumeMusic(128);
+				}
+				else {
+					Mix_VolumeMusic(0);
+				}
+			}
 		}
 		//renders changed background and text
 		SDL_RenderClear(gRender);
 		Background.renderTexture(backText, gRender);
 		backButton.renderTexture(bButtonText, gRender);
-		SDL_RenderCopy(gRender, txtTexture, NULL, &txtRect);
+		SDL_RenderCopy(gRender, txtTexture, nullptr, &txtRect);
 		SDL_RenderPresent(gRender);
 		SDL_Delay(15);
 	}
 	//deallocates texture
-	SDL_DestroyTexture(txtTexture);
-	txtTexture = NULL;
-	SDL_DestroyTexture(bButtonText);
-	bButtonText = NULL;
 	SDL_DestroyTexture(backText);
-	backText = NULL;
+	backText = nullptr;
+
+	SDL_DestroyTexture(txtTexture);
+	txtTexture = nullptr;
+	SDL_DestroyTexture(bButtonText);
+	bButtonText = nullptr;
+	SDL_DestroyTexture(backText);
+	backText = nullptr;
 	SDL_RenderClear(gRender);
+
+	TTF_CloseFont(mainFont);
+	mainFont = nullptr;
+
+	//deallocate music
+	Mix_FreeMusic(music);
+	music = nullptr;
 	return;
 }
 
@@ -577,8 +756,11 @@ The 'lecture' screen, is simply a screen full of tips and information regarding 
 It can be accessed through the title screen or losing the game
 */
 void loadLecture() {
+	//music
+	Mix_Music* music = Mix_LoadMUS("audio/lecture.mp3");
+
 	//12 premade tips to be loaded at random
-	std::string tips[12] = {
+	const static std::string tips[12] = {
 		"The more days you survive, the harder the levels become. The harder scrambling algorithms, use permutations to shuffle the text. Most encryption keys, use a form a permutation, called Substitutation-permutation network",
 		"The first 10 days have a chance of 66% giving and easy scramble, the trick is, the characters are simply shifted. Digital encryption was used during WW2 called the Engima.",
 		"Encryption for the internet was originially setup by the US government, encryption didn't go public till the 1970s.",
@@ -609,7 +791,7 @@ void loadLecture() {
 	bodyRect.w = 1100;
 	bodyRect.x = (WIDTH / 2) - (bodyRect.w / 2);
 	bodyRect.y = 110;
-	SDL_Texture* bodyTexture = NULL;
+	SDL_Texture* bodyTexture = nullptr;
 	//loads into texture
 	bodyTexture = LoadFont(bodyTexture, templete, { 0,0,0 },bodyFont,bodyRect.w);
 
@@ -623,13 +805,17 @@ void loadLecture() {
 	tipRect.w = tips[r].length()*2.8;
 	tipRect.x = (WIDTH / 2) - (tipRect.w / 2);
 	tipRect.y = 20 + bodyRect.h + bodyRect.y;
-	SDL_Texture* tipTexture = NULL;
+	SDL_Texture* tipTexture = nullptr;
 	//loads tip texture
 	tipTexture = LoadFont(tipTexture, tips[r], { 0,0,0 }, tipFont, tipRect.w);
 
 	bool quit = false;
+	bool muted = false;
 	SDL_Event e;
+
+	Mix_PlayMusic(music, -1);
 	while (!quit) {
+		const Uint8* state = SDL_GetKeyboardState(nullptr);
 		if (SDL_WaitEvent(&e) != 0) {
 			if (e.type == SDL_KEYDOWN) {
 				//hitting q, exits to title screen
@@ -644,20 +830,39 @@ void loadLecture() {
 				gExit = true;
 				scrMode = 0;
 			}
+			if (state[SDL_SCANCODE_M]) {
+				muted = !muted;
+				if (muted) {
+					Mix_VolumeMusic(128);
+				}
+				else {
+					Mix_VolumeMusic(0);
+				}
+			}
 		}
 		//Render text
 		SDL_RenderClear(gRender);
 		Background.renderTexture(backText, gRender);
-		SDL_RenderCopy(gRender, bodyTexture, NULL, &bodyRect);
-		SDL_RenderCopy(gRender, tipTexture, NULL, &tipRect);
+		SDL_RenderCopy(gRender, bodyTexture, nullptr, &bodyRect);
+		SDL_RenderCopy(gRender, tipTexture, nullptr, &tipRect);
 		SDL_RenderPresent(gRender);
+		SDL_Delay(10);
 	}
 	//deallocates textures
 	SDL_DestroyTexture(backText);
-	backText = NULL;
+	backText = nullptr;
+
 	SDL_DestroyTexture(bodyTexture);
-	bodyTexture = NULL;
+	bodyTexture = nullptr;
 	SDL_DestroyTexture(tipTexture);
-	tipTexture = NULL;
+	tipTexture = nullptr;
+
+	TTF_CloseFont(bodyFont);
+	bodyFont = nullptr;
+
+	//deallocate music
+	Mix_FreeMusic(music);
+	music = nullptr;
+
 	return;
 }

@@ -10,7 +10,7 @@
 */
 
 //Set of simply messages
-const std::string easy_msgs[15] = {
+static const std::string easy_msgs[15] = {
 	"Jerry",
 	"Justin",
 	"Dogs and cats",
@@ -29,7 +29,7 @@ const std::string easy_msgs[15] = {
 };
 
 //set of medium level messages
-const std::string med_msgs[10] = {
+static const std::string med_msgs[10] = {
 	"Jerry has cake",
 	"Justin is here",
 	"Milk and Cookies",
@@ -43,7 +43,7 @@ const std::string med_msgs[10] = {
 };
 
 //set of hard and complex messages
-const std::string hard_msgs[5] = {
+static const std::string hard_msgs[5] = {
 	"Carsten likes to play games",
 	"the Dell laptop is small",
 	"This game is quite bad", 

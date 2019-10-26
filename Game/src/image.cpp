@@ -54,14 +54,14 @@ SDL_Texture* Image::LoadImage(SDL_Renderer* render) {
 
 	//temp is the texture being returned
 	//surface is a temporary rendering type that is need to convert to texture type
-	SDL_Texture* temp = NULL;
-	SDL_Surface* surface = NULL;
+	SDL_Texture* temp = nullptr;
+	SDL_Surface* surface = nullptr;
 
 	//sets the surface to the image by loading it
 	surface = IMG_Load(this->path.c_str());
 
 	//checks if it was successful
-	if (surface == NULL) {
+	if (surface == nullptr) {
 		logSDLError("Unable to load image");
 	}
 	else {
@@ -69,13 +69,13 @@ SDL_Texture* Image::LoadImage(SDL_Renderer* render) {
 		temp = SDL_CreateTextureFromSurface(render, surface);
 
 		//checks for failure
-		if (temp == NULL) {
+		if (temp == nullptr) {
 			logSDLError("Unable to create texture from image");
 		}
 
 		//deallocates the surface
 		SDL_FreeSurface(surface);
-		surface = NULL;
+		surface = nullptr;
 	}
 	return temp;
 }
@@ -84,8 +84,8 @@ SDL_Texture* Image::LoadImage(SDL_Renderer* render) {
 void Image::renderTexture(SDL_Texture *tex, SDL_Renderer *ren) {
 	//Setup the destination rectangle to be at the position we want
 	//Query the texture to get its width and height to use
-	SDL_QueryTexture(tex, NULL, NULL, &rect.w, &rect.h);
-	SDL_RenderCopy(ren, tex, NULL, &rect);
+	SDL_QueryTexture(tex, nullptr, nullptr, &rect.w, &rect.h);
+	SDL_RenderCopy(ren, tex, nullptr, &rect);
 }
 
 // returns true or false, if the image is clicked on

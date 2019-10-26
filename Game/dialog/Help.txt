@@ -1,7 +1,9 @@
-Welcome to Decrypt! A game that teaches you the basics surrounding encryption. You're a poor hacker who is tasked with completing client's jobs, to steal information and get out of collage debt. (You were to lazy to listen to your parents)
+Welcome to Decrypt! A game that teaches you the basics surrounding encryption. You're tasked with unscrambleing messages the game gives you. You have three chances to do so, if not you lose. If you can get past 20 days, you win! As you progress, the difficulty of the message increases.
+
+Btw: press 'm' to mute the in-game music
+Developer: Chency W
 
 RULES::
-- First you'll be given a message for the task you'll be completing
 - You're to unscramble the message given
 - The key given, are clues to how to unscramble the message
 - If you unscramble the message incorrectly, then you will have to try again and 

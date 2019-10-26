@@ -27,7 +27,6 @@ int main(int argc, char *args[]) {
 				loadTitle();
 			}
 			else if (scrMode == MAIN) {
-				day = 0;
 				loadMain();
 			}
 			else if (scrMode == HELP) {
